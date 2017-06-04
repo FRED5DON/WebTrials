@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <!--<link rel="stylesheet" href="../styles/"/>-->
+</head>
+<body>
+<div id="app">
+    <app-frame>
+        <app-nav ref="appNav">
+        </app-nav>
+        <app-content ref="appContent">
+        </app-content>
+        <app-tabbar ref="appTabbar">
+        </app-tabbar>
+    </app-frame>
+</div>
+
+<script src="../../app/lib/core/vue.js"></script>
+<script src="../../app/view/template/template.js"></script>
+<!--<script src="../../app/view/home.js"></script>-->
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+        data: {
+            data:null,
+        },
+        computed: {
+            content: {
+                get: function () {
+                    return this.data;
+                },
+                set: function (newValue) {
+                    this.data = newValue;
+                }
+
+            }
+        },
+        methods: {
+
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="app/lib/core/vue.js"></script>
+    <style>
+
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s
+        }
+
+        .fade-enter, .fade-leave-active {
+            opacity: 0
+        }
+        .text-danger{
+            color: red;
+        }
+
+    </style>
+
+    <script src="app/lib/tools/urltools.js"></script>
+    <script src="app/route.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+
+
+    <span v-bind:title="message" v-on:click="alert">
+    {{getMessage}}
+  </span>
+
+    <transition name="fade">
+        <p v-if="on">on</p>
+    </transition>
+
+    <ol v-bind:class="{'text-danger': hasError }">
+        <li v-for="item in users">
+            <fred-article v-bind:art="item"></fred-article>
+        </li>
+    </ol>
+
+    <p>{{ auth.key }}</p>
+    <input v-model="auth.key">
+
+
+    <p>{{uname}}</p>
+    <input v-model="uname">
+
+    <template v-if="on">
+        <h1>Title</h1>
+        <p>Paragraph 1</p>
+        <p>Paragraph 2</p>
+    </template>
+</div>
+
+
+<script>
+
+    Vue.component('fred-article', {
+        props: ['art'],
+        template: '<p>{{art.name}}</p>'
+    })
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            on: true,
+            message: 'Hello Vue!',
+            name: '',
+            hasError:true,
+            users: [
+                {'name': 'fred'},
+                {'name': 'Gsiner'},
+                {'name': 'Ricky'},
+            ],
+            auth: {
+                token: '',
+                key: ''
+            }
+        },
+        computed: {
+            getMessage: function () {
+                return this.message + new Date();
+            },
+            uname: {
+                get: function () {
+                    return this.name;
+                },
+                set: function (newValue) {
+                    this.name = newValue.toUpperCase();
+                    this.message='';
+                }
+
+            }
+        },
+        methods: {
+            alert: function () {
+                alert(this.message);
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

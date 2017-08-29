@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas,
+        .coords {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        .coords {
+            z-index: 500;
+        }
+
+        .coords:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            border: 1px solid chartreuse;
+            width: 100%;
+            height: 0;
+            display: block;
+        }
+
+        .coords:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            border: 1px solid chartreuse;
+            height: 100%;
+            width: 0px;
+            display: block;
+        }
+
+        .co-half {
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<!--<div class="coords">-->
+    <!--<div class="co-half" hidden="hidden"></div>-->
+<!--</div>-->
+<canvas id="canvas">
+    "Sorry ,UR Browser Is Not Support WebGL"
+</canvas>
+
+
+<script id="vertex" type="o-shader/x-vertex">
+    attribute vec4 a_position;
+    attribute vec4 a_color;
+    varying vec4 v_color;
+    void main(){
+        gl_Position = a_position;
+        v_color=a_color;
+    }
+</script>
+
+<script id="fragment" type="o-shader/x-fragment">
+    precision lowp float;
+    varying vec4 v_color;
+    void main(){
+        gl_FragColor = v_color;
+    }
+
+</script>
+
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript">
+
+    var canvas = document.querySelector('canvas#canvas');
+    canvas.height = window.innerHeight;
+    canvas.width = screen.width;
+    var canvasContext = new CanvasContext('canvas#canvas');
+    var gl = canvasContext.getWebGLContext(true);
+    var program = CanvasContext.initShader(gl,
+            CanvasContext.getShader(gl, '#vertex'),
+            CanvasContext.getShader(gl, '#fragment'));
+    //获取顶点着色器中顶点的位置
+    var positionLocation = gl.getAttribLocation(program, "a_position");
+    var aColor = gl.getAttribLocation(program, "a_color");
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    var a_arrays = new Float32Array([
+        -0.4, 0.4, 0, 1.0, 0.3, 0.0,
+        -0.4, 0, 0, 0.0, 0.3, 0.0,
+        0.2, 0.4, 0, 1.0, 0.7, 0.0,
+        0.2, 0, 0, 0.0, 0.3, 0.4
+    ]);
+    const SIZE = a_arrays.BYTES_PER_ELEMENT;
+    gl.bufferData(gl.ARRAY_BUFFER, a_arrays, gl.STATIC_DRAW);
+    //  设置变量获取数据规则
+    //  第二个参数2表示每个顶点只有两个数据
+    //  后面两个参数用于控制数组包括多种数据内容的情况，先都设为0
+    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, SIZE * 6, 0);
+    //        //允许变量从ARRAY_BUFFER目标代理的缓冲区中获取数据
+    gl.enableVertexAttribArray(positionLocation);
+
+
+    gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, SIZE * 6, SIZE * 3);
+    gl.enableVertexAttribArray(aColor);
+
+
+//    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--<script src="jquery/jquery.mobile.custom.js" ></script>-->
+</head>
+<body>
+
+<a href="home.html">
+    home
+</a>
+
+<a href="about.html">
+    about
+</a>
+
+<script>
+
+    window.addEventListener('popstate', function(e) {
+        //在popstate事件触发后,事件对象event保存了当前浏览器历史记录的状态.
+        //e.state保存了pushState添加的state的引用
+        alert(1);
+//        console.log(e.state);  //输出 {page: 1}
+    });
+    window.addEventListener('hashchange', function() {
+        alert(location.hash);
+    });
+</script>
+
+</body>
+</html>

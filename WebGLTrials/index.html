@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas,
+        .coords {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        .coords {
+            z-index: 500;
+        }
+
+        .coords:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            border: 1px solid chartreuse;
+            width: 100%;
+            height: 0;
+            display: block;
+        }
+
+        .coords:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            border: 1px solid chartreuse;
+            height: 100%;
+            width: 0px;
+            display: block;
+        }
+
+        .co-half {
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<!--<div class="coords">-->
+<!--<div class="co-half" hidden="hidden"></div>-->
+<!--</div>-->
+<canvas id="canvas">
+    "Sorry ,UR Browser Is Not Support WebGL"
+</canvas>
+
+
+<script id="vertex" type="o-shader/x-vertex">
+    attribute vec4 a_position;
+    void main(){
+        gl_Position = a_position;
+        gl_PointSize=20.0;
+    }
+
+
+</script>
+
+<script id="fragment" type="o-shader/x-fragment">
+    void main(){
+        gl_FragColor=vec4(1.0, 0.0, 0.0, 1.0);
+    }
+
+</script>
+
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript">
+
+    var canvas = document.querySelector('canvas#canvas');
+    canvas.height = window.innerHeight;
+    canvas.width = screen.width;
+    var canvasContext = new CanvasContext('canvas#canvas');
+    var gl = canvasContext.getWebGLContext(true);
+    var program = CanvasContext.initShader(gl,
+            CanvasContext.getShader(gl, '#vertex'),
+            CanvasContext.getShader(gl, '#fragment'));
+
+    //获取顶点着色器中顶点的位置
+    var positionLocation = gl.getAttribLocation(program, "a_position");
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+
+    var a_all = [], a_arrays = [];
+    var pushArr = function (event) {
+        var rect = event.target.getBoundingClientRect();
+        var x = event.clientX || event.touches[0].pageX;
+        var y = event.clientY||event.touches[0].pageY;
+        var gX = (x - rect.left - canvas.width / 2) / (canvas.width / 2);
+        var gY = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
+        a_arrays.push(gX);
+        a_arrays.push(gY);
+    };
+
+    var isDown = false;
+    var move = 'ontouchmove' in document ? 'ontouchmove' : 'onmousemove' ;
+    var down = 'ontouchstart' in document ? 'ontouchstart' : 'onmousedown' ;
+    var up = 'ontouchend' in document ? 'ontouchend' : 'onmouseup' ;
+
+    canvas[down] = function (event) {
+        isDown = true;
+
+    };
+    canvas[up] = function (event) {
+        isDown = false;
+        a_arrays = [];
+    };
+
+    canvas[move] = function (event) {
+        if (!isDown) {
+            return;
+        }
+        pushArr(event);
+        if (a_arrays.length < 3) {
+            return;
+        }
+        gl.bufferData(
+                gl.ARRAY_BUFFER,
+                new Float32Array(a_arrays),
+                gl.STATIC_DRAW);
+        //  设置变量获取数据规则
+        //  第二个参数2表示每个顶点只有两个数据
+        //  后面两个参数用于控制数组包括多种数据内容的情况，先都设为0
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+//        //允许变量从ARRAY_BUFFER目标代理的缓冲区中获取数据
+        gl.enableVertexAttribArray(positionLocation);
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearDepth(gl.DEPTH_BUFFER_BIT);
+        gl.drawArrays(gl.LINE_STRIP, 0,a_arrays.length / 2);
+
+    };
+
+
+</script>
+</body>
+</html>
